@@ -3,10 +3,6 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-var viewport Graphic
-var window *sdl.Window
-var pxfmt *sdl.PixelFormat
-
 //func SetUpWindow(w, h int, fullscreen bool, g Graphic) {
 func SetUpWindow(w, h int, fullscreen bool) {
 	var err error
@@ -33,12 +29,6 @@ func SetUpWindow(w, h int, fullscreen bool) {
 
 	// assign to global so all gfx routines use same format
 	pxfmt = surface.Format
-
-	surface.FillRect(nil, 0)
-
-	rect := sdl.Rect{0, 0, 200, 200}
-	surface.FillRect(&rect, 0xffff0000)
-
 
 	viewport = &sdlSurfaceWrapper{surface}
 

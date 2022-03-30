@@ -78,16 +78,31 @@ func (b *Button) SetDirtyFlag(isDirty bool) {
 
 func (tg *TileGrid) draw() Graphic {
 	graphicBounds := tg.GetBounds()
+	tileWidth :=  tg.tileGraphics[0].GetWidth()
+	tileHeight := tg.tileGraphics[0].GetHeight()
 	entireGrid := NewBlankGraphic(graphicBounds.W, graphicBounds.H)
 	for i, _ := range tg.grid {
-		blitY := (i / tg.rowsAmount) * tg.tileGraphics[0].GetWidth()
-		blitX := (i - blitY) * tg.tileGraphics[0].GetHeight()
+		blitY := (i / tg.rowsAmount) * tileHeight
+		blitX := (i  % tg.rowsAmount) * tileWidth
+		fmt.Println("Blit coords:", blitX, blitY)
 		j := tg.grid[i]
-		tg.tileGraphics[j].Blit(entireGrid, Rect{blitX, blitY, graphicBounds.W, graphicBounds.H})
+		tg.tileGraphics[j].Blit(entireGrid, Rect{blitX, blitY, tileWidth, tileHeight})
 	}
 	tg.SetDirtyFlag(false)
 	println("Drew tilegrid")
 	return entireGrid
+}
+
+func (tg *TileGrid) GetGrid() []int {
+	return tg.grid
+}
+
+func (tg *TileGrid) GetTileAt(x, y int) int {
+	return tg.grid[x + y * tg.columnsAmount]
+}
+
+func (tg *TileGrid) SetTileAt(x, y, i int) {
+	tg.grid[x + y * tg.columnsAmount] = i
 }
 
 func NewTileGridFromFiles(filePaths []string, gridClick func(int, int), columnsAmount, rowsAmount, viewportX, viewportY int) *TileGrid {
@@ -113,7 +128,7 @@ func NewTileGridFromFiles(filePaths []string, gridClick func(int, int), columnsA
 }
 
 func (tg *TileGrid) click(clientX, clientY int) {
-	tg.onclick(clientX / tg.columnsAmount, clientY / tg.rowsAmount)
+	tg.onclick(clientX / (tg.GetBounds().W / tg.columnsAmount), clientY / (tg.GetBounds().H / tg.rowsAmount))
 }
 
 func (tg *TileGrid) GetBounds() Rect {

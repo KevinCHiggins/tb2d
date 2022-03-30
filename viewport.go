@@ -1,5 +1,7 @@
 package tb2d
 
+
+// put in window.go?
 // draw
 
 func blitDrawables() {
