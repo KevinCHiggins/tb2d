@@ -8,3 +8,4 @@ var viewport Graphic
 var window *sdl.Window
 var pxfmt *sdl.PixelFormat
 var pressedClickable Clickable
+var tick func()

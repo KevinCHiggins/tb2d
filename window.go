@@ -32,18 +32,4 @@ func SetUpWindow(w, h int, fullscreen bool) {
 
 	viewport = &sdlSurfaceWrapper{surface}
 
-	/*
-
-	s := g.GetSurf()
-	rect = sdl.Rect{0, 0, 120, 36}
-	//s.FillRect(&rect, 0xffffff00)
-	print(s.W)
-	print(s.H)
-	print(s.Format.Format == surface.Format.Format)
-	print(s.Format.Format)
-	if s.Blit(&rect, surface, &rect) != nil {
-		panic(err)
-	}
-	*/
-
 }

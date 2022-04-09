@@ -3,12 +3,17 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
-func Start(tick func()) {
+func SetTick(newTick func()) {
+	tick = newTick
+}
+
+func Start() {
 
 	defer sdl.Quit()
 	defer window.Destroy()
 	running := true
 	for running {
+		tick()
 		blitDrawables()
 		window.UpdateSurface()
 		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {

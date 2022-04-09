@@ -13,8 +13,9 @@ type Entity interface {
 
 type Drawable interface {
 	Entity
-	GetDirtyFlag() bool
-	SetDirtyFlag(bool)
+	GetDirtyFlag() bool // bit confusing because this is a bool flag
+	SetDirtyFlag()
+	ClearDirtyFlag()
 	draw() Graphic
 }
 
@@ -43,7 +44,7 @@ type TileGrid struct {
 }
 
 func (b *Button) draw() Graphic {
-	b.SetDirtyFlag(false)
+	b.ClearDirtyFlag()
 	println("Drew button")
 	return b.graphic
 }
@@ -54,6 +55,36 @@ func NewButtonFromFile(filePath string, buttonClick func(), viewportX, viewportY
 	drawables = append(drawables, Drawable(&b))
 	clickables = append(clickables, Clickable(&b))
 	return &b
+}
+
+func DeleteButton (b *Button) error {
+	foundButton := false
+	var newDrawables []Drawable
+	for _, d := range drawables {
+		if Drawable(b) != d {
+			newDrawables = append(newDrawables, d)
+		} else {
+			foundButton = true
+		}
+	}
+	if !foundButton {
+		return errors.New("Button not found in drawables") 
+	}
+	foundButton = false
+	var newClickables []Clickable
+	for _, d := range clickables {
+		if Clickable(b) != d {
+			newClickables = append(newClickables, d)
+		} else {
+			foundButton = true
+		}
+	}
+	if !foundButton {
+		return errors.New("Button not found in clickables") 
+	}
+	drawables = newDrawables
+	clickables = newClickables
+	return nil
 }
 
 func (b *Button) click(clientX, clientY int) {
@@ -72,8 +103,29 @@ func (b *Button) GetDirtyFlag() bool {
 	return !b.isClean
 }
 
-func (b *Button) SetDirtyFlag(isDirty bool) {
-	b.isClean = !isDirty
+func (b *Button) SetDirtyFlag() {
+	b.isClean = false
+}
+
+func (b *Button) ClearDirtyFlag() {
+	b.isClean = true
+}
+
+func (b *Button) CenterInRect(holder Rect) {
+	holderCenterX := holder.X + (holder.W / 2)
+	holderCenterY := holder.Y + (holder.H / 2)
+	origButtonBounds := b.GetBounds()
+	b.SetBounds(Rect{holderCenterX - (origButtonBounds.W / 2),
+		holderCenterY - (origButtonBounds.H / 2),
+		origButtonBounds.W,
+		origButtonBounds.H})
+	debugB := b.GetBounds()
+	println("It is done foist", debugB.X, debugB.Y, debugB.W, debugB.H)
+	//b.SetBounds(Rect{0, 0,
+	//	origButtonBounds.W,
+	//	origButtonBounds.H})
+	debugB = b.GetBounds()
+	println("It is done", debugB.X, debugB.Y, debugB.W, debugB.H)
 }
 
 func (tg *TileGrid) draw() Graphic {
@@ -88,7 +140,7 @@ func (tg *TileGrid) draw() Graphic {
 		j := tg.grid[i]
 		tg.tileGraphics[j].Blit(entireGrid, Rect{blitX, blitY, tileWidth, tileHeight})
 	}
-	tg.SetDirtyFlag(false)
+	tg.ClearDirtyFlag()
 	println("Drew tilegrid")
 	return entireGrid
 }
@@ -139,24 +191,14 @@ func (tg *TileGrid) SetBounds(r Rect) {
 	tg.bounds = r
 }
 
-func (tg *TileGrid) SetDirtyFlag(isDirty bool) {
-	tg.isClean = !isDirty
+func (tg *TileGrid) SetDirtyFlag() {
+	tg.isClean = false
+}
+
+func (tg *TileGrid) ClearDirtyFlag() {
+	tg.isClean = true
 }
 
 func (tg *TileGrid) GetDirtyFlag() bool {
 	return !tg.isClean
 }
-
-/*
-type TileGrid struct {
-	tiles []*Graphic
-}
-
-func (t *TileGrid) draw() *Graphic {
-	// make new Graphic (needs a function to do that) and blit tiles into it
-	// what about bounds checks (on creation as well as drawing?)
-}
-func (t *TileGrid) click(clientX, clientY int) {
-
-}
-*/
